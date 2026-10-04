@@ -3,10 +3,8 @@ import random
 
 filename = sys.argv[1]
 output = []
-my_name = "michelle"
 
-if my_name = "michelle":
-	pass
+my_name = "michelle"
 
 ten = 6 + 4
 
