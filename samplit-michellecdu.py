@@ -3,6 +3,12 @@ import random
 
 filename = sys.argv[1]
 output = []
+my_name = "michelle"
+
+if my_name = "michelle":
+	pass
+
+ten = 6 + 4
 
 with open(filename, "r") as f:
 	for line in f:
