@@ -4,8 +4,7 @@ import random
 filename = sys.argv[1]
 output = []
 
-this_class = "data136"
-scores = [100, 78, 80, 94]
+my_name = "Michelle Du"
 
 with open(filename, "r") as f:
 	for line in f:
