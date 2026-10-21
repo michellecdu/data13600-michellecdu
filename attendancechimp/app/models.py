@@ -32,36 +32,77 @@ logger = logging.getLogger(__name__) # set up tracking, auditing, and debugging
 # User profiles
 # ---------------------------------------------------------------------------
 
+class StudentProfile(models.Model):
+    """
+    Student user, linked to uploads (attendance) and enrollments.
+    """
+    first_name = models.CharField(max_length=50)
+    surname = models.CharField(max_length=50)
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
 
-
+class InstructorProfile(models.Model):
+    """
+    Instructor user, each instructor can teach multiple courses.
+    """
+    first_name = models.CharField(max_length=50)
+    surname = models.CharField(max_length=50)
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
 
 # ---------------------------------------------------------------------------
 # Course
 # ---------------------------------------------------------------------------
 
-
-
+class Course(models.Model):
+    """
+    Courses are taught by one instructor with a weekly meeting schedule.
+    """
+    name = models.CharField(max_length=100)
+    instructor = models.ForeignKey(InstructorProfile, on_delete=models.CASCADE)
+    quarter = models.CharField(max_length=20)  # "Autumn 2026"
+    meeting_days = models.CharField(max_length=10)  # "MWF" or "TR"
+    time_start = models.TimeField()
+    time_end = models.TimeField()
 
 # ---------------------------------------------------------------------------
 # Enrollment
 # ---------------------------------------------------------------------------
 
+class Enrollment(models.Model):
+    """
+    Links students to courses they are enrolled in (many-to-many).
+    """
+    student = models.ForeignKey(StudentProfile, on_delete=models.CASCADE)
+    course = models.ForeignKey(Course, on_delete=models.CASCADE)
 
-
+    class Meta:  # ensure that each (student, course) pair is unique
+        constraints = [
+            models.UniqueConstraint(fields=['student', 'course'], name='unique_enrollment')
+        ]
 
 # ---------------------------------------------------------------------------
 # Lecture
 # ---------------------------------------------------------------------------
 
-
-
+class Lecture(models.Model):
+    """
+    Single class lecture, with qr_code as the identifier for the projected QR image.
+    """
+    course = models.ForeignKey(Course, on_delete=models.CASCADE)
+    lecture_date = models.DateField()
+    qr_code = models.CharField(max_length=20, unique=True)
 
 # ---------------------------------------------------------------------------
 # QR Code Upload
 # ---------------------------------------------------------------------------
 
-
-
+class QRCodeUpload(models.Model):
+    """
+    Stores QR code uploads by students every lecture.
+    """
+    student = models.ForeignKey(StudentProfile, on_delete=models.CASCADE)
+    lecture = models.ForeignKey(Lecture, on_delete=models.SET_NULL, null=True, blank=True)
+    file = models.FileField(upload_to='uploads/')
+    upload_timestamp = models.DateTimeField(auto_now_add=True)
 
 # ---------------------------------------------------------------------------
 # Helper / API functions
