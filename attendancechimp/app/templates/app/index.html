@@ -10,11 +10,25 @@
     </style>
 </head>
 <body>
-<div class="bio">
-    <h1>AttendanceChimp</h1>
-    <p>Electronic class attendance tracking application.</p>
-    <hr>
+    <div class="bio">
+        <h1>AttendanceChimp</h1>
+        <p>Electronic class attendance tracking application for college instructors.</p>
+        <hr>
 
-</div>
+    <div class="user">
+        {% if user.is_authenticated %}
+            <p> Logged in as: <strong class="username">{{ user.username }}</strong></p>
+            <form method="post" action="{% url 'logout' %}">
+                {% csrf_token %}
+                <button type="submit">Log Out</button>
+            </form>
+        {% else %}
+            <p>Not logged in.</p>
+        {% endif %}
+    </div>
+
+    <div class="time">
+        <h2>Time: {{ time }}</h2>
+    </div>
 </body>
 </html>

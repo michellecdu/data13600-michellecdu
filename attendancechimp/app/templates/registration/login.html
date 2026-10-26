@@ -3,5 +3,14 @@
 <body style="text-align:center; font-family:Arial;">
 <h1>Log In</h1>
 
+<form method="post" action="{% url 'login' %}">
+    {% csrf_token %}
+    <input type="hidden" name="next" value="/app/">
+    <label for="username">Username:</label>
+    <input type="text" id="username" name="username" required><br><br>
+    <label for="password">Password:</label>
+    <input type="password" id="password" name="password" required><br><br>
+    <button type="submit">Log In</button>
+</form>
 </body>
 </html>
