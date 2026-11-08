@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>New Course</title>
+</head>
+<body>
+    <h1>Create a Course</h1>
+
+    <form action="/app/createCourse" method="post" class="form">
+        {% csrf_token %}
+        <label>Course Name:
+            <input type="text" id="course-name" name="course-name" required>
+        </label><br>
+
+        <label>Start Time:
+            <input type="time" id="start-time" name="start-time" required>
+        </label><br>
+        
+        <label>End Time:
+            <input type="time" id="end-time" name="end-time" required>
+        </label><br>
+
+        <p> Meeting Days:</p>
+        <label> Monday
+            <input type="checkbox" id="day-mon" name="day-mon">
+        </label><br>
+        <label> Tuesday
+            <input type="checkbox" id="day-tue" name="day-tue">
+        </label><br>
+        <label> Wednesday
+            <input type="checkbox" id="day-wed" name="day-wed">
+        </label><br>
+        <label> Thursday
+            <input type="checkbox" id="day-thu" name="day-thu">
+        </label><br>
+        <label> Friday
+            <input type="checkbox" id="day-fri" name="day-fri">
+        </label><br>
+
+        <button type="submit">Create Course</button>
+
+    </form>
+</body>
+</html>
