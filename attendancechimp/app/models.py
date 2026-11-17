@@ -122,9 +122,11 @@ DAYS = ["M", "T", "W", "R", "F", "S", "U"]
 
 def getUploadsForCourse(course):
     """Return all QRCodeUpload objects for a given course with validation."""
+    
     course_obj = Course.objects.filter(name=course).first()
     if course_obj is None:
         return []
+    
     valid_uploads = []
     all_uploads = QRCodeUpload.objects.filter(lecture__course=course_obj)
     for upload in all_uploads:
