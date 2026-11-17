@@ -18,4 +18,7 @@ urlpatterns = [
     path('createQRCodeUpload', views.createQRCodeUpload, name='createQRCodeUpload'),
     path('dumpUploads', views.dumpUploads, name='dumpUploads'),
 
+    # API endpoints (HW 6)
+    path('getUploads', views.getUploads, name='getUploads'),
+
 ]

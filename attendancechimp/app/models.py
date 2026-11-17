@@ -22,6 +22,9 @@ from django.contrib.auth.models import User
 import logging
 import string
 import random
+import zoneinfo
+
+CDT = zoneinfo.ZoneInfo("America/Chicago")
 
 logger = logging.getLogger(__name__) # set up tracking, auditing, and debugging
                                                                # allows using logger.warning(), logger.error(), 
@@ -88,7 +91,7 @@ class Lecture(models.Model):
     """
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
     lecture_date = models.DateField()
-    qr_code = models.CharField(max_length=20, unique=True)
+    qr_code = models.CharField(max_length=32, unique=True)
 
 # ---------------------------------------------------------------------------
 # QR Code Upload
@@ -115,4 +118,21 @@ def is_student(user):
     """Check if the user is a student."""
     return user.is_authenticated and StudentProfile.objects.filter(user=user).exists()
 
+DAYS = ["M", "T", "W", "R", "F", "S", "U"]
+
+def getUploadsForCourse(course):
+    """Return all QRCodeUpload objects for a given course with validation."""
+    course_obj = Course.objects.filter(name=course).first()
+    if course_obj is None:
+        return []
+    valid_uploads = []
+    all_uploads = QRCodeUpload.objects.filter(lecture__course=course_obj)
+    for upload in all_uploads:
+        local_time = upload.upload_timestamp.astimezone(CDT)
+        day = DAYS[local_time.weekday()]
+        meets_today = day in course_obj.meeting_days
+        in_class = course_obj.time_start <= local_time.time() <= course_obj.time_end
+        if meets_today and in_class:
+            valid_uploads.append(upload)
+    return valid_uploads
 
