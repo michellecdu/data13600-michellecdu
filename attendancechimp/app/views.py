@@ -5,9 +5,8 @@ Each view corresponds to one URL endpoint.  Views receive an HTTP request,
 interact with the database via models.py, and return an HTTP response.
 """
 
-from random import random
 import string
-import uuid
+import random
 
 from django.shortcuts import render, redirect
 from django.http import (HttpResponse, HttpResponseForbidden,
