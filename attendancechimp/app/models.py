@@ -16,6 +16,9 @@ Entities
 - QRCodeUpload    : a student's uploaded QR-code photograph
 """
 
+from PIL import Image
+import pyzbar.pyzbar
+
 from django.db import models
 from django.contrib.auth.models import User
 
@@ -138,3 +141,15 @@ def getUploadsForCourse(course):
             valid_uploads.append(upload)
     return valid_uploads
 
+def decodeQR(image):
+    """Decode a QR code from an image file, if possible."""
+    try:
+        file = Image.open(image)
+        results = pyzbar.pyzbar.decode(file)
+    except Exception:
+        return None
+    try:
+        decoded_file = results[0].data.decode("utf-8")
+    except IndexError:
+        return None
+    return decoded_file

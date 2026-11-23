@@ -5,6 +5,8 @@ Each view corresponds to one URL endpoint.  Views receive an HTTP request,
 interact with the database via models.py, and return an HTTP response.
 """
 
+from random import random
+import string
 import uuid
 
 from django.shortcuts import render, redirect
@@ -20,7 +22,7 @@ import json
 import io
 
 from .models import (InstructorProfile, StudentProfile, Course, Enrollment,
-                      Lecture, QRCodeUpload, is_instructor, is_student, getUploadsForCourse)
+                      Lecture, QRCodeUpload, decodeQR, is_instructor, is_student, getUploadsForCourse)
 
 CDT = zoneinfo.ZoneInfo("America/Chicago")
 
@@ -142,10 +144,17 @@ def createLecture(request):
     if course is None:
         return HttpResponse("Course does not exist.", status=400)
 
+    qr = request.POST.get("qrdata")
+    if not qr:
+        qr = "".join(random.choices(string.ascii_letters + string.digits, k=16))
+
+    if Lecture.objects.filter(qr_code=qr).exists():
+        return HttpResponse("Lecture with this QR code already exists.", status=400)
+    
     Lecture.objects.create(
         course=course,
         lecture_date=datetime.now(CDT),
-        qr_code=uuid.uuid4().hex
+        qr_code=qr
     )
     return HttpResponse(f"Lecture created successfully.", status=200)
 
@@ -161,12 +170,27 @@ def createQRCodeUpload(request):
     if image is None:
         return HttpResponse("No file uploaded.", status=400)
 
+    is_valid = True
+    decoded_image = decodeQR(image)
+    if decoded_image:
+        lecture = Lecture.objects.filter(qr_code=decoded_image).first()
+        if not lecture:
+            is_valid = False
+    else:
+        lecture = None
+        is_valid = False
+    
     QRCodeUpload.objects.create(
         student=student_profile,
+        lecture=lecture,
         file=image,
         upload_timestamp=datetime.now(CDT)
     )
-    return HttpResponse(f"QR code uploaded successfully.", status=200)
+
+    if not is_valid:
+        return JsonResponse({"error": "Invalid QR code"}, status=400)
+
+    return JsonResponse({"status": "ok"}, status=200)
 
 @csrf_exempt
 @require_GET
